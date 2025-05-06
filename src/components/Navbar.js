@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { animate } from 'motion';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   const isActive = (path) => {
@@ -16,8 +18,73 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Handle scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      if (offset > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    // Initial animation for navbar
+    animate(
+      '.navbar',
+      { y: [-20, 0], opacity: [0, 1] },
+      { duration: 0.5, easing: 'ease-out' }
+    );
+    
+    // Staggered animation for nav links
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach((link, index) => {
+      animate(
+        link,
+        { opacity: [0, 1], y: [-10, 0] },
+        { delay: 0.1 + (index * 0.1), duration: 0.4, easing: 'ease-out' }
+      );
+    });
+    
+    // Animation for signup button
+    animate(
+      '.signup-button',
+      { opacity: [0, 1], scale: [0.9, 1] },
+      { delay: 0.5, duration: 0.4, easing: 'ease-out' }
+    );
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Animation for mobile menu toggle
+  useEffect(() => {
+    if (isMenuOpen) {
+      animate(
+        '.mobile-menu',
+        { opacity: [0, 1], height: ['0px', 'auto'] },
+        { duration: 0.3, easing: 'ease-out' }
+      );
+      
+      // Staggered animation for mobile menu items
+      const mobileLinks = document.querySelectorAll('.mobile-link');
+      mobileLinks.forEach((link, index) => {
+        animate(
+          link,
+          { opacity: [0, 1], x: [-20, 0] },
+          { delay: 0.1 + (index * 0.05), duration: 0.3, easing: 'ease-out' }
+        );
+      });
+    }
+  }, [isMenuOpen]);
+
   return (
-    <nav className="bg-white dark:bg-black/40 shadow-sm sticky top-0 z-50">
+    <nav className={`navbar bg-white dark:bg-black/40 shadow-sm sticky top-0 z-50 transition-all duration-300 ${
+      scrolled ? 'shadow-md' : ''
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -29,7 +96,7 @@ export default function Navbar() {
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link 
                 href="/" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                className={`nav-link inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/') 
                     ? 'border-blue-500 text-foreground' 
                     : 'border-transparent text-foreground/60 hover:text-foreground hover:border-foreground/20'
@@ -39,7 +106,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/about" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                className={`nav-link inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/about') 
                     ? 'border-blue-500 text-foreground' 
                     : 'border-transparent text-foreground/60 hover:text-foreground hover:border-foreground/20'
@@ -49,7 +116,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/features" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                className={`nav-link inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/features') 
                     ? 'border-blue-500 text-foreground' 
                     : 'border-transparent text-foreground/60 hover:text-foreground hover:border-foreground/20'
@@ -59,7 +126,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/pricing" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                className={`nav-link inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/pricing') 
                     ? 'border-blue-500 text-foreground' 
                     : 'border-transparent text-foreground/60 hover:text-foreground hover:border-foreground/20'
@@ -69,7 +136,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/contact" 
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                className={`nav-link inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/contact') 
                     ? 'border-blue-500 text-foreground' 
                     : 'border-transparent text-foreground/60 hover:text-foreground hover:border-foreground/20'
@@ -82,7 +149,7 @@ export default function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <Link 
               href="/signup" 
-              className="ml-3 px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="signup-button ml-3 px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Sign Up
             </Link>
@@ -109,11 +176,11 @@ export default function Navbar() {
       </div>
 
       {isMenuOpen && (
-        <div className="sm:hidden">
+        <div className="mobile-menu sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
             <Link
               href="/"
-              className={`block pl-3 pr-4 py-2 text-base font-medium ${
+              className={`mobile-link block pl-3 pr-4 py-2 text-base font-medium ${
                 isActive('/') 
                   ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300' 
                   : 'border-l-4 border-transparent text-foreground/70 hover:bg-foreground/5 hover:border-foreground/20 hover:text-foreground'
@@ -124,7 +191,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/about"
-              className={`block pl-3 pr-4 py-2 text-base font-medium ${
+              className={`mobile-link block pl-3 pr-4 py-2 text-base font-medium ${
                 isActive('/about') 
                   ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300' 
                   : 'border-l-4 border-transparent text-foreground/70 hover:bg-foreground/5 hover:border-foreground/20 hover:text-foreground'
@@ -135,7 +202,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/features"
-              className={`block pl-3 pr-4 py-2 text-base font-medium ${
+              className={`mobile-link block pl-3 pr-4 py-2 text-base font-medium ${
                 isActive('/features') 
                   ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300' 
                   : 'border-l-4 border-transparent text-foreground/70 hover:bg-foreground/5 hover:border-foreground/20 hover:text-foreground'
@@ -146,7 +213,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/pricing"
-              className={`block pl-3 pr-4 py-2 text-base font-medium ${
+              className={`mobile-link block pl-3 pr-4 py-2 text-base font-medium ${
                 isActive('/pricing') 
                   ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300' 
                   : 'border-l-4 border-transparent text-foreground/70 hover:bg-foreground/5 hover:border-foreground/20 hover:text-foreground'
@@ -157,7 +224,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/contact"
-              className={`block pl-3 pr-4 py-2 text-base font-medium ${
+              className={`mobile-link block pl-3 pr-4 py-2 text-base font-medium ${
                 isActive('/contact') 
                   ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300' 
                   : 'border-l-4 border-transparent text-foreground/70 hover:bg-foreground/5 hover:border-foreground/20 hover:text-foreground'
@@ -168,7 +235,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/signup"
-              className="block px-4 py-2 mx-3 mt-2 text-center text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              className="mobile-link block px-4 py-2 mx-3 mt-2 text-center text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700"
               onClick={toggleMenu}
             >
               Sign Up

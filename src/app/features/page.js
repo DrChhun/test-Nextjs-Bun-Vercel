@@ -1,4 +1,52 @@
+'use client';
+
+import { useEffect } from "react";
+import { useScrollAnimation, useStaggerChildren } from "../../components/animations";
+import { animate } from "motion";
+
 export default function Features() {
+  // Enable scroll animations
+  useScrollAnimation();
+  
+  // Apply staggered animation to feature cards
+  useStaggerChildren('.features-grid', '.feature-card', 0.2, 0.15, 0.6);
+  
+  // Add hover animations
+  useEffect(() => {
+    const featureCards = document.querySelectorAll('.feature-card');
+    
+    featureCards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        animate(card, 
+          { 
+            y: -5,
+            scale: 1.02,
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }, 
+          { duration: 0.2 }
+        );
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        animate(card, 
+          { 
+            y: 0,
+            scale: 1,
+            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+          }, 
+          { duration: 0.2 }
+        );
+      });
+    });
+    
+    return () => {
+      featureCards.forEach(card => {
+        card.removeEventListener('mouseenter', () => {});
+        card.removeEventListener('mouseleave', () => {});
+      });
+    };
+  }, []);
+
   const features = [
     {
       title: "Modern Design",
@@ -34,10 +82,19 @@ export default function Features() {
 
   return (
     <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <h1 className="text-4xl font-bold mb-12 text-center">Our Features</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <h1 
+        className="text-4xl font-bold mb-12 text-center"
+        data-animate
+        data-animation="fade"
+      >
+        Our Features
+      </h1>
+      <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => (
-          <div key={index} className="bg-white dark:bg-black/20 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+          <div 
+            key={index} 
+            className="feature-card bg-white dark:bg-black/20 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+          >
             <div className="text-4xl mb-4">{feature.icon}</div>
             <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
             <p className="text-foreground/70">{feature.description}</p>

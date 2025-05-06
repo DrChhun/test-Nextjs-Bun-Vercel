@@ -1,34 +1,79 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
+import { 
+  useFadeIn, 
+  useSlideIn, 
+  useStaggerChildren, 
+  useScale, 
+  useBounce, 
+  useScrollAnimation 
+} from "../components/animations";
 
 export default function Home() {
+  // Apply animations
+  useFadeIn('.hero-title', 0.2, 0.8);
+  useSlideIn('.hero-description', 'up', 0.5, 0.8);
+  useSlideIn('.hero-cta', 'up', 0.8, 0.6);
+  useScale('.hero-image', 1, 1);
+  
+  useStaggerChildren('.features-grid', '.feature-card', 0.3, 0.2, 0.6);
+  
+  useScrollAnimation(); // Enable scroll animations for elements with data-animate attribute
+  
+  // Hover animation for CTA buttons
+  useEffect(() => {
+    const buttons = document.querySelectorAll('.cta-button');
+    
+    buttons.forEach(button => {
+      button.addEventListener('mouseenter', () => {
+        const { animate } = require('motion');
+        animate(button, { scale: 1.05 }, { duration: 0.2 });
+      });
+      
+      button.addEventListener('mouseleave', () => {
+        const { animate } = require('motion');
+        animate(button, { scale: 1 }, { duration: 0.2 });
+      });
+    });
+    
+    return () => {
+      buttons.forEach(button => {
+        button.removeEventListener('mouseenter', () => {});
+        button.removeEventListener('mouseleave', () => {});
+      });
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-[#f5f5f7] dark:from-background dark:to-[#111]">
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col items-center text-center mb-16">
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+          <h1 className="hero-title text-4xl sm:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
             Build Something Amazing
           </h1>
-          <p className="text-lg sm:text-xl max-w-2xl text-foreground/80 mb-10">
+          <p className="hero-description text-lg sm:text-xl max-w-2xl text-foreground/80 mb-10">
             The modern platform for building beautiful, responsive websites with the latest technologies.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="hero-cta flex flex-col sm:flex-row gap-4">
             <Link
               href="/signup"
-              className="px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors text-center"
+              className="cta-button px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors text-center"
             >
               Get Started
             </Link>
             <Link
               href="/features"
-              className="px-8 py-3 rounded-full border border-foreground/20 hover:bg-foreground/5 font-medium transition-colors text-center"
+              className="cta-button px-8 py-3 rounded-full border border-foreground/20 hover:bg-foreground/5 font-medium transition-colors text-center"
             >
               Learn More
             </Link>
           </div>
         </div>
-        <div className="relative h-[400px] sm:h-[500px] w-full rounded-xl overflow-hidden shadow-2xl">
+        <div className="hero-image relative h-[400px] sm:h-[500px] w-full rounded-xl overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 z-10"></div>
           <Image 
             src="https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=2812&auto=format&fit=crop"
@@ -42,8 +87,14 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <h2 
+          data-animate 
+          data-animation="slideUp" 
+          className="text-3xl font-bold text-center mb-12"
+        >
+          Key Features
+        </h2>
+        <div className="features-grid grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
               title: "Modern Design",
@@ -61,7 +112,10 @@ export default function Home() {
               icon: "🛠️",
             },
           ].map((feature, index) => (
-            <div key={index} className="flex flex-col items-center text-center p-6 rounded-xl bg-white dark:bg-black/20 shadow-sm hover:shadow-md transition-shadow">
+            <div 
+              key={index} 
+              className="feature-card flex flex-col items-center text-center p-6 rounded-xl bg-white dark:bg-black/20 shadow-sm hover:shadow-md transition-shadow"
+            >
               <div className="text-4xl mb-4">{feature.icon}</div>
               <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
               <p className="text-foreground/70">{feature.description}</p>
@@ -72,6 +126,9 @@ export default function Home() {
           <Link
             href="/features"
             className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+            data-animate
+            data-animation="fade"
+            data-delay="0.5"
           >
             View all features
             <svg className="w-4 h-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
@@ -83,7 +140,11 @@ export default function Home() {
 
       {/* Testimonial Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-8 sm:p-10">
+        <div 
+          className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-8 sm:p-10"
+          data-animate
+          data-animation="scale"
+        >
           <h2 className="text-3xl font-bold text-center mb-12">What People Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
@@ -103,7 +164,13 @@ export default function Home() {
                 role: "CEO",
               },
             ].map((testimonial, index) => (
-              <div key={index} className="bg-white dark:bg-black/40 p-6 rounded-xl shadow-sm">
+              <div 
+                key={index} 
+                className="bg-white dark:bg-black/40 p-6 rounded-xl shadow-sm"
+                data-animate
+                data-animation="slideUp"
+                data-delay={index * 0.2}
+              >
                 <p className="text-foreground/80 mb-4 italic">"{testimonial.quote}"</p>
                 <div>
                   <p className="font-semibold">{testimonial.author}</p>
@@ -117,14 +184,18 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center">
+        <div 
+          className="text-center"
+          data-animate
+          data-animation="slideUp"
+        >
           <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
           <p className="text-lg max-w-2xl mx-auto text-foreground/80 mb-8">
             Join thousands of developers and businesses building amazing products.
           </p>
           <Link
             href="/signup"
-            className="px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors inline-block"
+            className="cta-button px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors inline-block"
           >
             Sign Up Now
           </Link>
